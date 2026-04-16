@@ -509,8 +509,12 @@ def index_post():
         # Knowledge score [40% weight]
         total_knowledge_items = len(updated_knowledge)
         selected_knowledge_items = len(selected_knowledge)
-        individual_item_weight = 40.0 / total_knowledge_items
-        knowledge_score = individual_item_weight * selected_knowledge_items
+        if total_knowledge_items > 0:
+            individual_item_weight = 40.0 / total_knowledge_items
+            knowledge_score = individual_item_weight * selected_knowledge_items
+        else:
+            individual_item_weight = 0.0
+            knowledge_score = 0.0
 
         if knowledge_score < 24.0:  # Considering 60% knowledge as the threshold
             knowledge_score_comment = (
@@ -529,7 +533,8 @@ def index_post():
         )
 
         ## Get first name of the user
-        first_name = request.form.getlist("first-name")
+        # use get() to receive a single string instead of getlist() which returns a list
+        first_name = request.form.get("first-name")
 
         return redirect(
             url_for(
@@ -664,8 +669,6 @@ def check_knowledge_or_bachelor(selected_track):
     curframe = inspect.currentframe()
     calframe = inspect.getouterframes(curframe, 2)
 
-    if calframe[1][3] == "update_track_menu":
-        test()
     if selected_track == "Cognitive Science":
         selected_track = "sec:cognitiveScience"
         selected_master = "sec:mscArtificialIntelligence"
